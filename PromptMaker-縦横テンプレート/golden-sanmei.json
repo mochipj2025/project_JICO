@@ -1,0 +1,7 @@
+[
+ {"birthDate":"1987-04-25","time":"06:00","expected":{"yearPillar":"丁卯","monthPillar":"甲辰","dayPillar":"甲辰","tenchusatsu":"寅卯天中殺"},"source":"既存固定監査値・2026-09-22検証記録"},
+ {"birthDate":"2026-02-04","time":"05:01","expected":{"yearPillar":"乙巳","monthPillar":"己丑"},"source":"既存audit-engine.mjsの検証済み期待値"},
+ {"birthDate":"2026-02-04","time":"05:03","expected":{"yearPillar":"丙午","monthPillar":"庚寅"},"source":"既存audit-engine.mjsの検証済み期待値"},
+ {"birthDate":"2026-04-05","time":"03:39","expected":{"monthPillar":"辛卯"},"source":"既存audit-engine.mjsの検証済み期待値"},
+ {"birthDate":"2026-04-05","time":"03:41","expected":{"monthPillar":"壬辰"},"source":"既存audit-engine.mjsの検証済み期待値"}
+]
