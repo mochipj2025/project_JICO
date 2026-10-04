@@ -1,0 +1,24 @@
+Use case: infographic-diagram
+Create one finished Japanese orgonite and sanmeigaku reading card, landscape 3:2. This is the completed output sample, not an application UI screenshot. Premium airy editorial design, warm ivory paper, fine gold border and botanical accents, pale lavender headings, mint and turquoise highlights. Beautiful large physically plausible transparent resin pyramid on left, containing blue-green amazonite chips, small bright peridot green chips, turquoise chips and delicate copper spiral. Soft product lighting, refined realistic craft rendering. Center/left below pyramid display three small stone swatches and their exact labels. Right contains clear Japanese typography with generous spacing, concise accurate calculation facts. Bottom a short encouraging message. Include all text below accurately, no extra calculation facts, no efficacy promises, no made-up charts.
+Exact text:
+Title: 「オルゴナイト × 算命学」
+Subtitle: 「願いを、かたちに。」
+Name: 「サンプル様」
+Left heading: 「あなたの願いに寄り添う石」
+Stone labels: 「メイン｜アマゾナイト」「希望・前進・表現」
+「サブ｜ペリドット」「前向き・明るさ」
+「サブ｜ターコイズ」「守り・旅・前進」
+Right heading: 「算命学の結果」
+「年柱　丁卯」
+「月柱　甲辰」
+「日柱　甲辰」
+「日干　甲（陽木）」
+「中心星　禄存星」
+「寅卯天中殺」
+Right secondary heading: 「叶えたい願い」
+「仕事運・人間関係」
+「新しい仕事に自信を持って前進したい」
+Bottom message: 「あなたらしい一歩を、軽やかに。」
+Small clear footer: 「制作イメージ・サンプル」
+「出生時刻不明のため12:00で暫定計算」
+Use selected stones as symbolic design materials, do not imply selection is mathematically derived from sanmeigaku. No birthdate printed. Japanese text sharp, coherent, all contained within safe margins.
