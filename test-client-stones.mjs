@@ -1,0 +1,30 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+const read=p=>fs.readFileSync(new URL(p,import.meta.url),'utf8');
+class Element{
+ constructor(tag='div'){this.tag=tag;this.value='';this.textContent='';this.innerHTML='copy';this.disabled=false;this.checked=false;this.children=[];this.handlers={};}
+ addEventListener(k,f){this.handlers[k]=f;}
+ append(...children){this.children.push(...children);}
+ replaceChildren(...children){this.children=children;}
+ querySelectorAll(selector){const all=this.children.flatMap(c=>[c,...(c.children||[])]);return all.filter(c=>c.tag==='input'&&(!selector.includes(':checked')||c.checked));}
+}
+const ids=['answer','stones','facts','condition','raw','stonePrompt','sanmeiPrompt','imagePrompt','pdfPrompt','copyStone','copySanmei','copyImage','copyPDF','status','reflect','sample','clientStoneList','mainStone','stoneChoiceHint','clearStones','suggestStones'];
+const els=Object.fromEntries(ids.map(id=>[id,new Element()]));
+const ctx=vm.createContext({document:{getElementById:id=>els[id],createElement:tag=>new Element(tag),createTextNode:text=>({textContent:text})}});
+for(const f of ['PromptMaker-縦横テンプレート/engine-data.js','PromptMaker-縦横テンプレート/workflow.js','client-stones.js'])vm.runInContext(read(f),ctx);
+let calls=0;const calculate=ctx.SanmeiEngine.calculate;ctx.SanmeiEngine.calculate=(...args)=>{calls++;return calculate(...args)};
+vm.runInContext(read('simple.js'),ctx);
+assert.equal(ctx.ClientStones.items.length,25);
+assert.equal(new Set(ctx.ClientStones.items.map(s=>s.name)).size,25);
+assert.equal(els.clientStoneList.querySelectorAll('input').length,25);
+els.sample.handlers.click();assert.equal(calls,1);assert.equal(els.copyImage.disabled,true);assert.ok(els.facts.textContent.includes('禄存星'));
+const inputs=els.clientStoneList.querySelectorAll('input');
+const choose=name=>{const item=ctx.ClientStones.items.find(s=>s.name===name),input=inputs.find(i=>i.value===item.id);input.checked=true;input.handlers.change();return item.id;};
+choose('岩塩');assert.ok(els.imagePrompt.value.includes('メイン：岩塩'));assert.ok(els.pdfPrompt.value.includes('メイン：岩塩'));assert.ok(els.imagePrompt.value.includes('説明データ未登録'));assert.ok(!els.imagePrompt.value.includes('アマゾナイト'));assert.equal(calls,1);
+const crystal=choose('水晶クリア');els.mainStone.value=crystal;els.mainStone.handlers.change();assert.ok(els.imagePrompt.value.includes('メイン：水晶クリア'));assert.ok(els.imagePrompt.value.includes('サブ：岩塩'));assert.equal(calls,1);
+for(const item of ctx.ClientStones.items){const set=ctx.ClientStones.select([item.id],item.id,{wishes:[]});assert.equal(set.stones[0].name,item.name);if(!item.source)assert.equal(set.stones[0].keywords.length,0);}
+els.clearStones.handlers.click();assert.equal(els.copyImage.disabled,true);assert.equal(els.pdfPrompt.value,'');assert.equal(calls,1);
+els.suggestStones.handlers.click();assert.equal(els.copyImage.disabled,false);const selected=els.clientStoneList.querySelectorAll('input:checked').map(i=>i.value);assert.ok(selected.length>0);assert.ok(selected.every(id=>ctx.ClientStones.items.some(item=>item.id===id)));assert.equal(calls,1);
+els.answer.handlers.input();assert.equal(els.copyImage.disabled,true);assert.equal(els.suggestStones.disabled,true);assert.equal(els.pdfPrompt.value,'');
+console.log('PASS 25素材・手動選択・メイン変更・未登録説明保留・画像/PDF一致・選択解除・リスト内おすすめ・再計算なし');
