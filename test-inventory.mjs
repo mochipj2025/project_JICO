@@ -1,0 +1,30 @@
+import fs from 'node:fs';import vm from 'node:vm';import assert from 'node:assert/strict';
+const read=p=>fs.readFileSync(new URL(p,import.meta.url),'utf8');
+const values=new Map(),storage={getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,v)};
+const ctx=vm.createContext({localStorage:storage});for(const f of ['PromptMaker-縦横テンプレート/engine-data.js','PromptMaker-縦横テンプレート/workflow.js','client-stones.js','inventory.js'])vm.runInContext(read(f),ctx);
+const {InventoryStore:S,MaterialInventory:I,ClientStones:C}=ctx;const id=C.items.find(s=>s.name==='シトリン').id;
+assert.equal(I.get(id),null);assert.equal(I.available(id),true);
+assert.throws(()=>I.change(id,'in',1,'g',0),/初回/);
+I.change(id,'set',10.5,'g',2,'棚卸し');I.change(id,'in',1.25,'g',2);assert.equal(I.get(id).quantity,11.75);I.change(id,'out',11.75,'g',2);assert.equal(I.get(id).quantity,0);assert.equal(I.available(id),false);
+assert.throws(()=>C.select([id],id,{wishes:['仕事運']}),/在庫切れ/);
+const customer={wishes:['仕事運'],colors:['ゴールド'],future:'前進'};assert.ok(!C.recommend(customer).includes(id));
+const before=JSON.stringify(I.snapshot());assert.throws(()=>I.change(id,'out',1,'g',0),/不足/);assert.equal(JSON.stringify(I.snapshot()),before);
+I.change(id,'set',4,'個',1);assert.throws(()=>I.change(id,'in',0.5,'個',1),/整数/);assert.throws(()=>I.change(id,'set',5,'g',1),/単位/);assert.throws(()=>I.change(id,'set',-1,'個',1));assert.throws(()=>I.change(id,'set','','個',1));
+I.change(id,'settings','', '個',3);assert.equal(I.get(id).quantity,4);assert.equal(I.get(id).low,3);
+const reload=S.create(storage);assert.equal(reload.get(id).quantity,4);assert.equal(reload.snapshot().history.length,5);
+const backup=JSON.parse(JSON.stringify(I.snapshot()));I.change(id,'out',2,'個',3);I.restore(backup);assert.equal(I.get(id).quantity,4);assert.equal(I.snapshot().history.length,5);
+assert.throws(()=>I.restore({format:'bad'}));
+const stale=S.create(storage);I.change(id,'in',1,'個',3);assert.throws(()=>stale.change(id,'in',1,'個',3),/別のタブ/);
+const failing=S.create({getItem:()=>null,setItem(){throw Error('quota')}});assert.throws(()=>failing.change(id,'set',1,'g',0),/保存できません/);assert.equal(failing.get(id),null);
+const corrupt=S.create({getItem:()=>'{broken',setItem(){throw Error('must not overwrite')}});assert.ok(corrupt.error);assert.throws(()=>corrupt.change(id,'set',1,'g',0),/読み込めません/);
+console.log('PASS 初期未登録・g/個・入荷使用棚卸し・不足拒否・整数/単位制限・履歴・復元・在庫切れ選定拒否・おすすめ除外・保存失敗/別タブ保護');
+// 在庫の更新が、選択中の素材と画像/PDFプロンプトへ反映されること。
+class Element{constructor(tag='div'){this.tag=tag;this.value='';this.textContent='';this.innerHTML='copy';this.disabled=false;this.checked=false;this.children=[];this.handlers={};this.style={};}addEventListener(k,f){this.handlers[k]=f;}append(...cs){for(const c of cs){c.parentElement=this;this.children.push(c);}}replaceChildren(...cs){this.children=[];this.append(...cs);}querySelectorAll(s){const all=this.children.flatMap(c=>[c,...(c.querySelectorAll?c.querySelectorAll('*'):[])]);return s==='*'?all:all.filter(c=>c.tag==='input'&&(!s.includes(':checked')||c.checked));}querySelector(s){return this.children.find(c=>c.className===s.slice(1))||null;}setAttribute(){}focus(){}scrollIntoView(){}}
+const html=read('index.html'),els=Object.fromEntries([...html.matchAll(/id="([^"]+)"/g)].map(m=>[m[1],new Element()]));
+const events={},memory=new Map(),doc={getElementById:id=>els[id],createElement:tag=>new Element(tag),createTextNode:text=>({textContent:text}),addEventListener(k,f){events[k]=f;},dispatchEvent(e){events[e.type]?.(e);}};
+const page=vm.createContext({document:doc,Event:class{constructor(type){this.type=type}},localStorage:{getItem:k=>memory.get(k)??null,setItem:(k,v)=>memory.set(k,v)}});
+for(const f of ['PromptMaker-縦横テンプレート/engine-data.js','PromptMaker-縦横テンプレート/workflow.js','client-stones.js','inventory.js','simple.js','inventory-ui.js'])vm.runInContext(read(f),page);
+els.sample.handlers.click();const material=page.ClientStones.items.find(i=>i.name==='シトリン'),input=els.clientStoneList.querySelectorAll('input').find(i=>i.value===material.id);input.checked=true;input.handlers.change();assert.equal(els.copyImage.disabled,false);
+els.inventoryMaterial.value=material.id;els.inventoryMaterial.handlers.change();els.inventoryAction.value='set';els.inventoryAmount.value='2';els.inventoryUnit.value='袋';els.inventoryLow.value='1';els.inventorySave.handlers.click();assert.equal(page.MaterialInventory.get(material.id).quantity,2);assert.ok(input.parentElement.querySelector('.stock-label').textContent.includes('2 袋'));
+els.inventoryAction.value='out';els.inventoryAmount.value='2';els.inventorySave.handlers.click();assert.equal(els.copyImage.disabled,true);assert.equal(els.pdfPrompt.value,'');assert.ok(els.status.textContent.includes('在庫切れ'));input.checked=false;input.handlers.change();assert.equal(input.disabled,true);assert.equal(els.inventoryRows.children.length,25);
+console.log('PASS 在庫画面保存→選定欄数量更新→使用でゼロ→選択済みプロンプト無効化・25行表示');
