@@ -14,7 +14,7 @@ function detailedFacts(s){
 const targets=s.stars.judaiShusei.targets,j=s.stars.junidaiJusei,n=s.stars.nijuhachigen,b=s.core.boundaries;
 return [W.facts(s),'','【十大主星・人体星図】',...['north','east','center','west','south'].map(k=>`${targets[k].label}：${targets[k].star}`),'','【十二大従星】',...[j.early,j.middle,j.late].map(v=>`${v.period}：${v.star}（エネルギー ${v.energy}）`),'','【月支の二十八元】',`月支 ${n.branch}／節入りから ${n.dayNumber}日目`,`${n.active.phase}：${n.active.stem}`,n.countRule,'','【節入り・計算基準】',`直前の節入り：${b.latestJie} ${b.latestJieJST}`,`立春：${b.lichunJST}`,'日本時間（Asia/Tokyo）'].join('\n');
 }
-function clear(){for(const id of ['stonePrompt','sanmeiPrompt','imagePrompt','pdfPrompt'])$(id).value='';for(const id of ['copyStone','copySanmei','copyImage','copyPDF'])$(id).disabled=true;for(const id of ['stones','facts'])$(id).textContent='フォーム反映後に表示します。';$('condition').textContent='';$('raw').textContent='';}
+function clear(){for(const id of ['stonePrompt','sanmeiPrompt','imagePrompt','pdfPrompt','advicePrompt'])$(id).value='';for(const id of ['copyStone','copySanmei','copyImage','copyPDF','copyAdvice'])$(id).disabled=true;for(const id of ['stones','facts'])$(id).textContent='フォーム反映後に表示します。';$('condition').textContent='';$('raw').textContent='';}
 function reflect(){clear();try{
 if(cachedAnswer!==$('answer').value||!cachedCase){cachedCase=null;cachedCase=W.parse($('answer').value);cachedAnswer=$('answer').value;}
 const {customer:c,sanmei:s}=cachedCase;$('suggestStones').disabled=false;syncChoices();updateStockLabels();
@@ -22,6 +22,7 @@ const condition=s.conditions.timeKnown?'出生時刻を含む計算結果。':'�
 const common=[`用途：${c.purpose==='gift'?'プレゼント':'本人'}`,`願い：${c.wishes.join('・')}`,`望む未来：${c.future}`];
 $('facts').textContent=detailedFacts(s);$('condition').textContent=condition;$('raw').textContent=JSON.stringify(s.raw,null,2);
 $('sanmeiPrompt').value=['以下の算命学計算結果から、わかりやすい鑑定文を作成してください。','命式・星は再計算せず、未記載の計算値を補完しないでください。解釈と計算事実を分け、断定しすぎない表現にしてください。',...common,condition,JSON.stringify({core:s.core,stars:s.stars},null,2)].join('\n');$('copySanmei').disabled=false;
+$('advicePrompt').value=AdvicePrompt.build(c,s);$('copyAdvice').disabled=false;
 try{const set=ClientStones.select(selectedIds(),$('mainStone').value,c);
 const lines=set.stones.map(stone=>`${stone.role}：${stone.name}\n象徴：${stone.keywords.length?stone.keywords.join('・'):'説明データ未登録（象徴・効能を創作しない）'}\n選定理由：${stone.reasons.join('／')}`);
 const notes=[set.uncovered.length?'対応未登録の願い：'+set.uncovered.join('・'):'',set.unmatchedColors.length?'作品配色に取り入れる希望色：'+set.unmatchedColors.join('・'):''].filter(Boolean);
@@ -32,7 +33,7 @@ $('pdfPrompt').value=['添付する完成画像と下記の計算結果を使っ
 }catch(e){$('stones').textContent=e.message;$('status').textContent='算命学を計算しました。'+e.message;}
 }catch(e){$('suggestStones').disabled=true;$('status').textContent=e.message;}}
 $('reflect').addEventListener('click',reflect);$('sample').addEventListener('click',()=>{$('answer').value=sample;reflect()});$('answer').addEventListener('input',()=>{cachedCase=null;cachedAnswer='';$('suggestStones').disabled=true;clear();$('status').textContent='回答が変わりました。「フォームを反映」を押してください。'});
-for(const [button,field] of [['copyStone','stonePrompt'],['copySanmei','sanmeiPrompt'],['copyImage','imagePrompt'],['copyPDF','pdfPrompt']]){
+for(const [button,field] of [['copyStone','stonePrompt'],['copySanmei','sanmeiPrompt'],['copyImage','imagePrompt'],['copyPDF','pdfPrompt'],['copyAdvice','advicePrompt']]){
 const btn=$(button),original=btn.innerHTML;let resetTimer;
 btn.addEventListener('click',async()=>{
 const text=$(field).value;if(!text){$('status').textContent='先に回答を反映してください。';return;}

@@ -1,7 +1,7 @@
 import fs from 'node:fs';import vm from 'node:vm';import assert from 'node:assert/strict';
 const read=p=>fs.readFileSync(new URL(p,import.meta.url),'utf8');
 const values=new Map(),storage={getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,v)};
-const ctx=vm.createContext({localStorage:storage});for(const f of ['PromptMaker-縦横テンプレート/engine-data.js','PromptMaker-縦横テンプレート/workflow.js','client-stones.js','inventory.js'])vm.runInContext(read(f),ctx);
+const ctx=vm.createContext({localStorage:storage});for(const f of ['PromptMaker-縦横テンプレート/engine-data.js','PromptMaker-縦横テンプレート/workflow.js','client-stones.js','advice-prompt.js','inventory.js'])vm.runInContext(read(f),ctx);
 const {InventoryStore:S,MaterialInventory:I,ClientStones:C}=ctx;const id=C.items.find(s=>s.name==='シトリン').id;
 assert.equal(I.get(id),null);assert.equal(I.available(id),true);
 assert.throws(()=>I.change(id,'in',1,'g',0),/初回/);
@@ -23,7 +23,7 @@ class Element{constructor(tag='div'){this.tag=tag;this.value='';this.textContent
 const html=read('index.html'),els=Object.fromEntries([...html.matchAll(/id="([^"]+)"/g)].map(m=>[m[1],new Element()]));
 const events={},memory=new Map(),doc={getElementById:id=>els[id],createElement:tag=>new Element(tag),createTextNode:text=>({textContent:text}),addEventListener(k,f){events[k]=f;},dispatchEvent(e){events[e.type]?.(e);}};
 const page=vm.createContext({document:doc,Event:class{constructor(type){this.type=type}},localStorage:{getItem:k=>memory.get(k)??null,setItem:(k,v)=>memory.set(k,v)}});
-for(const f of ['PromptMaker-縦横テンプレート/engine-data.js','PromptMaker-縦横テンプレート/workflow.js','client-stones.js','inventory.js','simple.js','inventory-ui.js'])vm.runInContext(read(f),page);
+for(const f of ['PromptMaker-縦横テンプレート/engine-data.js','PromptMaker-縦横テンプレート/workflow.js','client-stones.js','advice-prompt.js','inventory.js','simple.js','inventory-ui.js'])vm.runInContext(read(f),page);
 els.sample.handlers.click();const material=page.ClientStones.items.find(i=>i.name==='シトリン'),input=els.clientStoneList.querySelectorAll('input').find(i=>i.value===material.id);input.checked=true;input.handlers.change();assert.equal(els.copyImage.disabled,false);
 els.inventoryMaterial.value=material.id;els.inventoryMaterial.handlers.change();els.inventoryAction.value='set';els.inventoryAmount.value='2';els.inventoryUnit.value='袋';els.inventoryLow.value='1';els.inventorySave.handlers.click();assert.equal(page.MaterialInventory.get(material.id).quantity,2);assert.ok(input.parentElement.querySelector('.stock-label').textContent.includes('2 袋'));
 els.inventoryAction.value='out';els.inventoryAmount.value='2';els.inventorySave.handlers.click();assert.equal(els.copyImage.disabled,true);assert.equal(els.pdfPrompt.value,'');assert.ok(els.status.textContent.includes('在庫切れ'));input.checked=false;input.handlers.change();assert.equal(input.disabled,true);assert.equal(els.inventoryRows.children.length,25);
