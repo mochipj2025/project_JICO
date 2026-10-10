@@ -53,3 +53,7 @@ node PromptMaker-縦横テンプレート/test-workflow.mjs
 石の簡易説明の確認先：[GIA アメジスト](https://4cs.gia.edu/en-us/blog/amethyst-variety-of-quartz/)、[GIA ローズクォーツ](https://www.gia.edu/rose-quartz-quality-factors)、[GIA アクアマリン](https://www.gia.edu/aquamarine)、[GIA ターコイズ](https://www.gia.edu/turquoise)。象徴のキーワードは既存の制作説明であり、鉱物学的な効果ではない。
 
 2026-10-11 実生成検証：assets/combined-advice-sample-prompt.txt を画像生成ツールへそのまま渡し、assets/combined-advice-sample-20261011.png を作成。作品＋4助言、3石の名前、希望のグリーン/ブルー、上部の石アイコン列なしを目視確認。外部ChatGPTの通常チャットによるツール選択やクリップボードは未検証。
+
+メインカード右側は「算命学の基本性格（日干・陰陽五行・中心星、傾向・活かし方）→望む未来→今日の一歩・今週の行動・気をつけること」の順に掲載。計算条件も下部に短く明記する。自動反映画面には日干・中心星の計算値を読み取り内容と一緒に表示する。
+
+算命学欄を明示した更新版も実生成確認済み：assets/combined-advice-sanmei-sample-prompt.txt → assets/combined-advice-sanmei-sample-20261011.png。日干 甲（陽木）・中心星 禄存星の一致、基本性格→未来→3行動の順、出生時刻不明の注記を目視確認。完成見本は更新版を表示する。

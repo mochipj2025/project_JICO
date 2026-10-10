@@ -37,3 +37,5 @@ console.log('PASS 自由文・別名見出し・任意項目省略・必須不�
 assert.ok(els.imagePrompt.value.startsWith('【実行依頼：画像を今すぐ生成】'));assert.ok(els.imagePrompt.value.includes('完成画像を1枚生成'));assert.ok(els.imagePrompt.value.includes('生成したふりをしない'));console.log('PASS 画像生成の実行指示・未指定作品案・生成不可時の正直な応答');
 
 const colorFirst=ctx.ClientStones.recommend({colors:['ピンク'],wishes:['仕事運'],future:'前進したい'});const first=ctx.ClientStones.items.find(s=>s.id===colorFirst[0]);assert.ok((first.source||first.brief).colors.includes('ピンク'));const mixed=ctx.FlexibleInput.parse('名前：むぎ\n1987年4月25日生まれ\n目標：新しい仕事に進みたい');assert.equal(mixed.customer.name,'むぎ');assert.equal(mixed.customer.birthDate,'1987-04-25');assert.ok(ctx.AdvicePrompt.template.includes('上部に石のアイコン列を並べない'));console.log('PASS 好きな色最優先・混在自由入力・作品と4助言を1枚に・不要なアイコン列除外');
+
+assert.ok(els.advicePrompt.value.includes('「算命学の基本性格」→「望む未来」'));assert.ok(els.advicePrompt.value.includes('入力の中心星'));assert.ok(els.advicePrompt.value.includes('傾向・活かし方'));assert.ok(els.advicePrompt.value.includes('出生時刻不明・12:00暫定計算'));console.log('PASS 算命学の明示・日干と中心星の原本維持・基本性格→未来→行動の順・暫定条件');
