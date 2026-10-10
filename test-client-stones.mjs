@@ -33,3 +33,5 @@ const free=ctx.FlexibleInput.parse('1987年4月25日生まれ\n新しい仕事�
 const alternate=ctx.FlexibleInput.parse('表示名：むぎ\n誕生日：1987/4/25\n目標：毎週、新しい仕事に応募したい\nカラー：青');assert.equal(alternate.customer.name,'むぎ');assert.equal(alternate.customer.colors[0],'青');assert.throws(()=>ctx.FlexibleInput.parse('新しい仕事に進みたい'),/生年月日/);assert.throws(()=>ctx.FlexibleInput.parse('1987-04-25'),/望む未来/);assert.throws(()=>ctx.FlexibleInput.parse('1987-04-25\n1988-04-25\n仕事に進みたい'),/生年月日/);assert.throws(()=>ctx.FlexibleInput.parse('1987-02-30\n仕事に進みたい'));
 els.answer.value='1987年4月25日生まれ\n新しい仕事に自信を持って前進したい';els.reflect.handlers.click();assert.equal(els.copyAdvice.disabled,false);choose('ローズクォーツ');assert.ok(els.stonePrompt.value.includes('色の目安：ピンク'));assert.ok(els.imagePrompt.value.includes('簡易特性：淡いピンクの水晶'));assert.ok(els.pdfPrompt.value.includes('色の目安：ピンク'));assert.ok(!els.advicePrompt.value.includes('ローズクォーツ'));
 console.log('PASS 自由文・別名見出し・任意項目省略・必須不足/複数日付/不正日付拒否・石の意味と色と簡易特性反映');
+
+assert.ok(els.imagePrompt.value.startsWith('【実行依頼：画像を今すぐ生成】'));assert.ok(els.imagePrompt.value.includes('完成画像を1枚生成'));assert.ok(els.imagePrompt.value.includes('生成したふりをしない'));console.log('PASS 画像生成の実行指示・未指定作品案・生成不可時の正直な応答');
