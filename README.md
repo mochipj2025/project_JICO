@@ -59,3 +59,5 @@ node PromptMaker-縦横テンプレート/test-workflow.mjs
 算命学欄を明示した更新版も実生成確認済み：assets/combined-advice-sanmei-sample-prompt.txt → assets/combined-advice-sanmei-sample-20261011.png。日干 甲（陽木）・中心星 禄存星の一致、基本性格→未来→3行動の順、出生時刻不明の注記を目視確認。完成見本は更新版を表示する。
 
 前向きな文体の更新版：assets/combined-advice-positive-sample-prompt.txt → assets/combined-advice-positive-sample-20261011.png を実生成確認済み。算命学・作品・望む未来を保持し、大切にしたい3つの視点、キーワード、応援文を掲載。時間/回数のノルマなしを目視確認。完成見本はこの更新版を表示する。
+
+5ケースの実生成チェック：assets/sample-check-20261011/index.html に一覧、CHECK.md に目視照合結果、manifest.json に入力と計算値・選定石、各入力/プロンプト/PNGを保存。5件の主要項目・前向きな構成は一致。詳細レイアウトや表現の断定度には揺れがあり、個別照合が必要。
