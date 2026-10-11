@@ -18,7 +18,7 @@ vm.runInContext(read('advice-prompt.js'),ctx);vm.runInContext(read('flexible-inp
 assert.equal(ctx.ClientStones.items.length,25);
 assert.equal(new Set(ctx.ClientStones.items.map(s=>s.name)).size,25);
 assert.equal(els.clientStoneList.querySelectorAll('input').length,25);
-els.sample.handlers.click();assert.equal(calls,1);assert.equal(els.copyAdvice.disabled,false);const adviceData=JSON.parse(els.advicePrompt.value.split('【入力データ】')[1]);assert.equal(adviceData.日干,'甲');assert.equal(adviceData.中心星,'禄存星');assert.equal(adviceData.望む未来,'新しい仕事に自信を持って前進したい');assert.ok(adviceData.選定した石.length>0);assert.ok(els.advicePrompt.value.includes('全体240字以内'));assert.equal(typeof els.copyAdvice.handlers.click,'function');assert.equal(els.copyImage.disabled,false);assert.ok(els.facts.textContent.includes('禄存星'));
+els.sample.handlers.click();assert.equal(calls,1);assert.equal(els.copyAdvice.disabled,false);const adviceData=JSON.parse(els.advicePrompt.value.split('【入力データ】')[1]);assert.equal(adviceData.日干,'甲');assert.equal(adviceData.中心星,'禄存星');assert.equal(adviceData.望む未来,'新しい仕事に自信を持って前進したい');assert.ok(adviceData.選定した石.length>0);assert.ok(els.advicePrompt.value.includes('全体500字以内'));assert.equal(typeof els.copyAdvice.handlers.click,'function');assert.equal(els.copyImage.disabled,false);assert.ok(els.facts.textContent.includes('禄存星'));
 els.clearStones.handlers.click();assert.equal(els.copyAdvice.disabled,true);const inputs=els.clientStoneList.querySelectorAll('input');
 const choose=name=>{const item=ctx.ClientStones.items.find(s=>s.name===name),input=inputs.find(i=>i.value===item.id);input.checked=true;input.handlers.change();return item.id;};
 choose('岩塩');assert.ok(els.imagePrompt.value.includes('メイン：岩塩'));assert.ok(els.pdfPrompt.value.includes('メイン：岩塩'));assert.ok(els.imagePrompt.value.includes('説明データ未登録'));assert.ok(!els.imagePrompt.value.includes('アマゾナイト'));assert.equal(calls,1);
@@ -36,8 +36,10 @@ console.log('PASS 自由文・別名見出し・任意項目省略・必須不�
 
 assert.ok(els.imagePrompt.value.startsWith('【実行依頼：画像を今すぐ生成】'));assert.ok(els.imagePrompt.value.includes('完成画像を1枚生成'));assert.ok(els.imagePrompt.value.includes('生成したふりをしない'));console.log('PASS 画像生成の実行指示・未指定作品案・生成不可時の正直な応答');
 
-const colorFirst=ctx.ClientStones.recommend({colors:['ピンク'],wishes:['仕事運'],future:'前進したい'});const first=ctx.ClientStones.items.find(s=>s.id===colorFirst[0]);assert.ok((first.source||first.brief).colors.includes('ピンク'));const mixed=ctx.FlexibleInput.parse('名前：むぎ\n1987年4月25日生まれ\n目標：新しい仕事に進みたい');assert.equal(mixed.customer.name,'むぎ');assert.equal(mixed.customer.birthDate,'1987-04-25');assert.ok(ctx.AdvicePrompt.template.includes('上部に石のアイコン列を並べない'));console.log('PASS 好きな色最優先・混在自由入力・作品と4助言を1枚に・不要なアイコン列除外');
+const colorFirst=ctx.ClientStones.recommend({colors:['ピンク'],wishes:['仕事運'],future:'前進したい'});const first=ctx.ClientStones.items.find(s=>s.id===colorFirst[0]);assert.ok((first.source||first.brief).colors.includes('ピンク'));const mixed=ctx.FlexibleInput.parse('名前：むぎ\n1987年4月25日生まれ\n目標：新しい仕事に進みたい');assert.equal(mixed.customer.name,'むぎ');assert.equal(mixed.customer.birthDate,'1987-04-25');assert.ok(ctx.AdvicePrompt.template.includes('上部に石のアイコン列を並べない'));console.log('PASS 好きな色最優先・混在自由入力・作品と前向きな助言を1枚に・不要なアイコン列除外');
 
-assert.ok(els.advicePrompt.value.includes('「算命学の基本性格」→「望む未来」'));assert.ok(els.advicePrompt.value.includes('入力の中心星'));assert.ok(els.advicePrompt.value.includes('傾向・活かし方'));assert.ok(els.advicePrompt.value.includes('出生時刻不明・12:00暫定計算'));console.log('PASS 算命学の明示・日干と中心星の原本維持・基本性格→未来→行動の順・暫定条件');
+assert.ok(els.advicePrompt.value.includes('「算命学の基本性格」→「望む未来」'));assert.ok(els.advicePrompt.value.includes('入力の中心星'));assert.ok(els.advicePrompt.value.includes('傾向・活かし方'));assert.ok(els.advicePrompt.value.includes('出生時刻不明・12:00暫定計算'));console.log('PASS 算命学の明示・日干と中心星の原本維持・基本性格→未来→前向きな視点の順・暫定条件');
 
 assert.ok(ctx.AdvicePrompt.template.includes('本人の希望形'));assert.ok(ctx.AdvicePrompt.template.includes('複数の希望形'));console.log('PASS 希望形の優先・未指定時のみピラミッド候補');
+
+assert.ok(ctx.AdvicePrompt.template.includes('大切にしたいこと3つ'));assert.ok(ctx.AdvicePrompt.template.includes('未来へのキーワード'));assert.ok(ctx.AdvicePrompt.template.includes('応援メッセージ'));assert.ok(ctx.AdvicePrompt.template.includes('時間・回数・ノルマは指定しない'));assert.ok(!ctx.AdvicePrompt.template.includes('① 今日の一歩'));assert.ok(ctx.AdvicePrompt.template.includes('毎回変える'));console.log('PASS 前向きな3つの視点・キーワード・応援文・ノルマなし・本人の未来に個別化');
